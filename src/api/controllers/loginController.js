@@ -1,3 +1,5 @@
+console.log('📦 Loading logincontroller.js');
+
 const { validationResult } = require("express-validator");
 const bcrypt = require('bcryptjs');
 
