@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const { body } = require('express-validator');
 const loginController = require('/app/src/api/controllers/loginController');
+const bcrypt = require('bcryptjs');
 
 // Validation rules
 const loginValidation = [
