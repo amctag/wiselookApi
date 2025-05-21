@@ -1,3 +1,4 @@
+console.log('📦 Loading db.js');
 const path = require('path');
 require('dotenv').config({ path: path.join(process.cwd(), 'src', 'api', 'routes', '.env') });
 
