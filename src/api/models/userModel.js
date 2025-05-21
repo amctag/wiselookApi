@@ -136,13 +136,12 @@ module.exports = {
 
   async getByPhone(phone_number) {
     const query = 'SELECT * FROM users WHERE phone_number = $1 AND is_active = true';
-    const { rows } = await pool.query(query, [phone_number]);
+    const { rows } = await db.query(query, [phone_number]);
     return rows[0];
   },
 
   async updateLastLogin(userId) {
     const query = 'UPDATE users SET last_login = NOW() WHERE id = $1';
-    await pool.query(query, [userId]);
+    await db.query(query, [userId]);
   },
-
-}; // End of User Model
+};
