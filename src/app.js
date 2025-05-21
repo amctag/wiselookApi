@@ -10,9 +10,9 @@ if (fs.existsSync(envPath)) {
   console.log(`✅ Loaded .env from: ${envPath}`);
 } else {
   console.warn(`⚠️ .env not found at: ${envPath}`);
-  dotenv.config(); // fallback
+  dotenv.config();
 }
-// Express و الإضافات
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -28,25 +28,20 @@ try {
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-console.log('__dirname:', __dirname);
-console.log('CWD:', process.cwd());
-
-// إعدادات الـ API
 const API_CONFIG = {
   basePath: process.env.API_BASE_PATH || '/api',
   enableVersioning: process.env.ENABLE_VERSIONING === 'true',
-  currentVersion: process.env.API_CURRENT_VERSION || '' // تم إزالة v1
+  currentVersion: process.env.API_CURRENT_VERSION || ''
 };
 
 console.log('API Config:', API_CONFIG);
 
-// Middleware
 app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
 app.use(helmet());
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
 app.use(express.json());
 
-// نقطة فحص
+// Debug endpoint
 app.get('/debug', (req, res) => {
   res.json({
     cwd: process.cwd(),
@@ -64,9 +59,8 @@ app.get(`${API_CONFIG.basePath}/health`, (req, res) => {
   res.json({ status: 'OK', timestamp: new Date() });
 });
 
-// تحميل التوجيهات
+// Load routes dynamically
 const loadRoutes = () => {
-  const baseRoutesPath = path.resolve(__dirname, 'src', 'api', 'routes');
   if (!fs.existsSync(baseRoutesPath)) {
     console.error(`❌ Routes directory not found: ${baseRoutesPath}`);
     return;
@@ -91,7 +85,11 @@ const loadRoutes = () => {
       .toLowerCase()
       .trim();
 
-    const routePath = `${API_CONFIG.basePath}/${routeName || 'default'}`;
+    const versionSegment = API_CONFIG.enableVersioning && API_CONFIG.currentVersion
+      ? `/${API_CONFIG.currentVersion}`
+      : '';
+
+    const routePath = `${API_CONFIG.basePath}${versionSegment}/${routeName || 'default'}`;
     app.use(routePath, route);
 
     console.log(`✅ Loaded route: ${file} -> ${routePath}`);
@@ -117,7 +115,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start Server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
   console.log(`🔗 Base API path: ${API_CONFIG.basePath}`);
