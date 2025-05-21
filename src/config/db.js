@@ -9,7 +9,7 @@ const pool = new Pool({
   database: process.env.DB_NAME,
   password: process.env.DB_PASS,
   port: process.env.DB_PORT || 3306,
-  ssl: process.env.DB_SSL === "true"
+  ssl: process.env.DB_SSL === "false"
 });
 
 // اختبار الاتصال عند بدء التشغيل
