@@ -4,6 +4,7 @@ const fs = require('fs');
 const dotenv = require('dotenv');
 const bcrypt = require('bcryptjs');
 
+
 // تحميل .env تلقائياً لو موجود
 const envPath = path.join(process.cwd(), 'src', 'api', 'routes', '.env');
 if (fs.existsSync(envPath)) {
