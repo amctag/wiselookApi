@@ -1,7 +1,7 @@
 // config/db.js
 const path = require('path');
 // Load .env from root directory (one level up from src)
-require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+require('dotenv').config({ path:path.join(process.cwd(), 'src', 'api', 'routes', '.env') });
 
 const { Pool } = require('pg');
 
