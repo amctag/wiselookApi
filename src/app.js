@@ -162,7 +162,7 @@ const loadApiRoutes = () => {
 
   // قائمة بالمسارات المحتملة للتوجيهات بترتيب الأولوية
   const possibleBasePaths = [
-    path.resolve(__dirname, 'src', 'api', 'routes', API_CONFIG.currentVersion),
+    path.resolve(__dirname, 'src', 'api', 'routes'),
     path.resolve(__dirname, 'api', 'routes', API_CONFIG.currentVersion),
     path.resolve(__dirname, 'routes', API_CONFIG.currentVersion),
     path.resolve(__dirname, '..', 'src', 'api', 'routes', API_CONFIG.currentVersion),
