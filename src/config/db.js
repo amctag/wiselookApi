@@ -8,8 +8,8 @@ const pool = new Pool({
   host: process.env.DB_HOST,
   database: process.env.DB_NAME,
   password: process.env.DB_PASS,
-  port: process.env.DB_PORT || 3306,
-  ssl: process.env.DB_SSL === "false"
+  port: process.env.DB_PORT || 5011,
+  ssl: process.env.DB_SSL === "true"
 });
 
 // اختبار الاتصال عند بدء التشغيل
