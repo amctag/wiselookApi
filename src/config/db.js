@@ -27,12 +27,13 @@ const query = async (text, params) => {
     console.log('Executing query:', text);
     if (params) console.log('With params:', params);
     const res = await pool.query(text, params);
-    return res;
+    return res.rows; // <-- ✅ التعديل هنا
   } catch (error) {
     console.error('Database query error:', error);
     throw error;
   }
 };
+
 
 
 module.exports = {
