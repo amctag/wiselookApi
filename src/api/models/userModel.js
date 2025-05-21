@@ -1,5 +1,5 @@
 // src/api/models/userModel.js
-const db = require("../../config/db");
+const db = require("/app/src/api/config/db");
 
 module.exports = {
   /**
