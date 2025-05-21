@@ -1,13 +1,16 @@
-// app.js (updated version)
+// app.js (corrected version)
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
-
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Debugging info at startup
+console.log('__dirname:', __dirname);
+console.log('Current working directory:', process.cwd());
 
 // Config
 const API_CONFIG = {
@@ -27,39 +30,57 @@ app.get(`${API_CONFIG.basePath}/health`, (req, res) => {
   res.json({ status: 'OK', timestamp: new Date() });
 });
 
-// Improved Route Loader
+// Improved Route Loader with better error handling
 const loadRoute = (routeFilePath, mountPath) => {
   try {
-    const route = require(routeFilePath);
+    // استخدام path.resolve للحصول على المسار المطلق
+    const resolvedPath = path.resolve(routeFilePath);
+    console.log(`Attempting to load route from: ${resolvedPath}`);
+    
+    const route = require(resolvedPath);
     app.use(mountPath, route);
-    console.log(`Mounted ${mountPath} -> ${routeFilePath}`);
+    console.log(`Successfully mounted ${mountPath} -> ${resolvedPath}`);
   } catch (err) {
-    console.error(`Route loading failed: ${mountPath}`, err.message);
-    console.log('Full error stack:', err.stack);
+    console.error(`Route loading failed for ${mountPath}:`, err.message);
+    console.error('Full error stack:', err.stack);
   }
 };
 
-// API Routes
+// API Routes with consistent path handling
 const loadApiRoutes = () => {
   const versionPrefix = API_CONFIG.enableVersioning ? `/${API_CONFIG.currentVersion}` : '';
   const basePath = API_CONFIG.basePath;
-  const routesDir = path.join(__dirname, 'api', 'routes', API_CONFIG.currentVersion);
-
+  
+  // تحديد المسار الأساسي للملفات على حسب هيكل المشروع
+  // هنا نفترض أن المسارات موجودة في ./src/api/routes/v1
+  const apiBasePath = path.resolve(__dirname, 'src', 'api', 'routes', API_CONFIG.currentVersion);
+  console.log(`Routes directory: ${apiBasePath}`);
+  
+  // تحميل مسار تسجيل الدخول
   loadRoute(
-    path.join(routesDir, 'loginRoute.js'),
+    path.join(apiBasePath, 'loginRoute.js'),
     `${basePath}${versionPrefix}/login`
   );
-
+  
+  // تحميل مسار التسجيل
   loadRoute(
-    path.join(routesDir, 'registerRoute.js'),
+    path.join(apiBasePath, 'registerRoute.js'),
     `${basePath}${versionPrefix}/register`
   );
-
-  // User Routes
+  
+  // تحميل مسارات المستخدم
   loadRoute(
-    path.join(routesDir, 'userRoutes.js'),
+    path.join(apiBasePath, 'userRoutes.js'),
     `${basePath}${versionPrefix}/users`
   );
+  
+  // طباعة المسارات المتاحة بعد التحميل
+  console.log('\nAvailable routes:');
+  app._router.stack.forEach(r => {
+    if (r.route && r.route.path) {
+      console.log(`${Object.keys(r.route.methods).join(',')} ${r.route.path}`);
+    }
+  });
 };
 
 // Debugging middleware
@@ -76,7 +97,8 @@ app.use((req, res) => {
   console.warn(`404: ${req.method} ${req.originalUrl}`);
   res.status(404).json({ 
     error: 'Route not found',
-    reason: `Cannot ${req.method} ${req.originalUrl}`
+    reason: `Cannot ${req.method} ${req.originalUrl}`,
+    availableEndpoints: API_CONFIG.basePath + '/health' // توفير معلومات إضافية
   });
 });
 
@@ -92,6 +114,6 @@ app.use((err, req, res, next) => {
 
 // Start Server
 app.listen(PORT, () => {
-  console.log(`\nAPI Endpoints:`);
   console.log(`\nServer ready on port ${PORT}`);
+  console.log(`Health check endpoint: ${API_CONFIG.basePath}/health`);
 });
