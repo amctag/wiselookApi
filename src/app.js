@@ -47,19 +47,25 @@ if (routeFiles.length === 0) {
 
 routeFiles.forEach(file => {
   const routePath = path.join(routesDir, file);
-  const route = require(routePath);
-
-  // اسم الراوت بناءً على اسم الملف، مثلا userRoute.js => /api/v1/user
+  const routeModule = require(routePath);
+  
+  // اسم الراوت بناءً على اسم الملف
   let routeName = file.replace(/Route(s)?\.js$/, '').toLowerCase();
-
-  // استخدم /default إذا ما صار اسم صالح
   if (!routeName) routeName = 'default';
-
   const fullRoutePath = `${apiPrefix}/${routeName}`;
-
-  app.use(fullRoutePath, route);
-
-  console.log(`✅ Route loaded: ${file} -> ${fullRoutePath}`);
+  
+  // التحقق من نوع القيمة المصدرة
+  if (typeof routeModule === 'function') {
+    // إذا كان دالة (middleware أو router)
+    app.use(fullRoutePath, routeModule);
+    console.log(`✅ Route loaded: ${file} -> ${fullRoutePath}`);
+  } else if (routeModule && typeof routeModule.router === 'function') {
+    // إذا كان كائن يحتوي على router
+    app.use(fullRoutePath, routeModule.router);
+    console.log(`✅ Route loaded: ${file} -> ${fullRoutePath}`);
+  } else {
+    console.error(`❌ Invalid route format in file: ${file}. Expected a router function.`);
+  }
 });
 
 // مسار صحة الخادم
