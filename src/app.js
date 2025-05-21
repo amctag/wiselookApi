@@ -2,16 +2,16 @@ const path = require('path');
 const fs = require('fs');
 const dotenv = require('dotenv');
 
-// تحميل ملف .env مباشرة من المسار المعروف
-const envPath = path.resolve(__dirname, 'src', 'api', 'routes', '.env');
+const baseRoutesPath = path.resolve(process.cwd(), 'src', 'api', 'routes');
+const envPath = path.join(baseRoutesPath, '.env');
+
 if (fs.existsSync(envPath)) {
   dotenv.config({ path: envPath });
   console.log(`✅ Loaded .env from: ${envPath}`);
 } else {
   console.warn(`⚠️ .env not found at: ${envPath}`);
-  dotenv.config(); // محاولة تحميل الافتراضي
+  dotenv.config(); // fallback
 }
-
 // Express و الإضافات
 const express = require('express');
 const cors = require('cors');
