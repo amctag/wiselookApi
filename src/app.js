@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const dotenv = require('dotenv');
+const bcrypt = require('bcryptjs');
 
 // تحميل .env تلقائياً لو موجود
 const envPath = path.join(process.cwd(), 'src', 'api', 'routes', '.env');
