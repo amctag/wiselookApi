@@ -17,7 +17,6 @@ pool.query('SELECT 1 FROM users')
   .then(() => console.log('PostgreSQL connected'))
   .catch(err => console.error('PostgreSQL connection error', err));
 
-// دالة query مع طباعة الاستعلامات والأخطاء
 const query = async (text, params) => {
   try {
     console.log('Executing query:', text);
@@ -26,7 +25,7 @@ const query = async (text, params) => {
     return res;
   } catch (error) {
     console.error('Database query error:', error);
-    throw error; // إعادة رمي الخطأ ليتم التعامل معه في مكان الاستدعاء
+    throw error;
   }
 };
 
