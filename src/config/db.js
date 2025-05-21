@@ -18,6 +18,11 @@ pool.query('SELECT 1 FROM users')
   .catch(err => console.error('PostgreSQL connection error', err));
 
 const query = async (text, params) => {
+  if (!text || typeof text !== 'string' || !text.trim()) {
+    console.error('❌ Empty or invalid SQL query passed to db.query');
+    throw new Error('Invalid SQL query');
+  }
+
   try {
     console.log('Executing query:', text);
     if (params) console.log('With params:', params);
@@ -28,6 +33,7 @@ const query = async (text, params) => {
     throw error;
   }
 };
+
 
 module.exports = {
   query,
