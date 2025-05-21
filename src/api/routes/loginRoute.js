@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { body } = require('express-validator');
 const loginController = require('/app/src/api/controllers/loginController'); // مسار نسبي مفترض
-const loginValidation = require('/app/src/api/middlewares/loginValidation');
+const loginValidation = require('/app/src/api/middlewares/userValidation');
 // Validation rules
 const loginValidation = [
   body('password')
