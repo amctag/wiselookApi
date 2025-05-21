@@ -1,8 +1,8 @@
-// src/api/routes/v1/authRoutes.js
+// src/api/routes/v1/registerRoute.js
 const express = require('express');
 const router = express.Router();
 const { body } = require('express-validator');
-const authController = require('../../controllers/authController');
+const authController = require('../../controllers/registerController');
 
 // Validation rules
 const registerValidation = [
@@ -31,26 +31,7 @@ const registerValidation = [
   body('bio').optional().isString()
 ];
 
-const loginValidation = [
-  body('password')
-    .notEmpty().withMessage('Password is required')
-    .isLength({ min: 8 }).withMessage('Password must be at least 8 characters'),
-  body().custom((value, { req }) => {
-    if (!req.body.email && !req.body.phone_number) {
-      throw new Error('Either email or phone number must be provided');
-    }
-    return true;
-  }),
-  body('email').if(body('phone_number').notExists())
-    .notEmpty().withMessage('Email is required when phone number is not provided')
-    .isEmail().withMessage('Invalid email format'),
-  body('phone_number').if(body('email').notExists())
-    .notEmpty().withMessage('Phone number is required when email is not provided')
-    .isMobilePhone().withMessage('Invalid phone number format')
-];
-
 // Routes
-router.post('/register', registerValidation, authController.register);
-router.post('/login', loginValidation, authController.login);
+router.post('/', registerValidation, authController.register);
 
 module.exports = router;

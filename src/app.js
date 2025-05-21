@@ -1,4 +1,4 @@
-// app.js
+// app.js (updated version)
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
@@ -27,47 +27,62 @@ app.get(`${API_CONFIG.basePath}/health`, (req, res) => {
   res.json({ status: 'OK', timestamp: new Date() });
 });
 
-// Routes
+// Improved Route Loader
 const loadRoute = (routeFilePath, mountPath) => {
   try {
     const route = require(routeFilePath);
     app.use(mountPath, route);
-    console.log(`Loaded route: ${mountPath}`);
+    console.log(`Mounted ${mountPath} -> ${routeFilePath}`);
   } catch (err) {
-    console.error(`Failed to load route at ${mountPath}:`, err.message);
+    console.error(`Route loading failed: ${mountPath}`, err.message);
+    console.log('Full error stack:', err.stack);
   }
 };
-
 
 // API Routes
 const loadApiRoutes = () => {
   const versionPrefix = API_CONFIG.enableVersioning ? `/${API_CONFIG.currentVersion}` : '';
   const basePath = API_CONFIG.basePath;
+  const routesDir = path.join(__dirname, 'api', 'routes', API_CONFIG.currentVersion);
 
-  // Mount userRoutes at /api/v1/users
   loadRoute(
-    path.join(__dirname, `./api/routes/${API_CONFIG.currentVersion}/userRoutes`),
-    `${basePath}${versionPrefix}/users`
+    path.join(routesDir, 'loginRoute.js'),
+    `${basePath}${versionPrefix}/login`
   );
 
-  // Mount authRoutes at /api/v1
   loadRoute(
-    path.join(__dirname, `./api/routes/${API_CONFIG.currentVersion}/authRoutes`),
-    `${basePath}${versionPrefix}`
+    path.join(routesDir, 'registerRoute.js'),
+    `${basePath}${versionPrefix}/register`
+  );
+
+  // User Routes
+  loadRoute(
+    path.join(routesDir, 'userRoutes.js'),
+    `${basePath}${versionPrefix}/users`
   );
 };
 
+// Debugging middleware
+app.use((req, res, next) => {
+  console.log(`Incoming: ${req.method} ${req.originalUrl}`);
+  next();
+});
 
-// Function load API Routes
+// Load routes
 loadApiRoutes();
 
-// 404 Handler
+// 404 Handler (must come after routes)
 app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found' });
+  console.warn(`404: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({ 
+    error: 'Route not found',
+    reason: `Cannot ${req.method} ${req.originalUrl}`
+  });
 });
 
 // Error Handler
 app.use((err, req, res, next) => {
+  console.error(`[ERROR] ${err.message}`);
   console.error(err.stack);
   res.status(500).json({ 
     error: 'Internal Server Error',
@@ -77,13 +92,6 @@ app.use((err, req, res, next) => {
 
 // Start Server
 app.listen(PORT, () => {
-  console.log(`API running on http://localhost:${PORT}${API_CONFIG.basePath}`);
-  console.log(`Version: ${API_CONFIG.currentVersion}`);
-  console.log(`Versioning ${API_CONFIG.enableVersioning ? 'enabled' : 'disabled'}`);
-});
-
-// Graceful Shutdown
-process.on('SIGINT', () => {
-  console.log('\nShutting down gracefully...');
-  process.exit();
+  console.log(`\nAPI Endpoints:`);
+  console.log(`\nServer ready on port ${PORT}`);
 });
