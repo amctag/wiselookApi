@@ -1,5 +1,5 @@
 // src/api/controllers/userController.js
-const userModel = require('app/src/api/models/userModel');
+const userModel = require('/app/src/api/models/userModel');
 
 module.exports = {
   async listUsers(req, res) {
