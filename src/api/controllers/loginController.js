@@ -1,24 +1,29 @@
-// src/api/controllers/loginController.js
 const userModel = require("../models/userModel");
 const { validationResult } = require("express-validator");
+const bcrypt = require("bcrypt");
 
 const loginController = {
   async login(req, res) {
     try {
       const { email, phone_number, password } = req.body;
 
-      // Find user by single identifier
+      if (!password || (!email && !phone_number)) {
+        return res.status(400).json({ error: "Missing credentials" });
+      }
+
       const user = email
         ? await userModel.getByEmail(email)
         : await userModel.getByPhone(phone_number);
 
-      // User not found or password mismatch
-      if (!user || user.password !== password) {
-        // Plain text comparison
+      if (!user) {
         return res.status(401).json({ error: "Invalid credentials" });
       }
 
-      // Successful login
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+
       return res.json({
         message: "Login successful",
         user: {
@@ -29,7 +34,7 @@ const loginController = {
         },
       });
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Login error:", error.message, error.stack);
       return res.status(500).json({ error: "Login failed" });
     }
   },
