@@ -1,5 +1,5 @@
 // src/api/controllers/registerController.js
-const userModel = require("../models/userModel");
+const userModel = require("app/src/api/models/userModel");
 const { validationResult } = require("express-validator");
 
 const registerController = {
