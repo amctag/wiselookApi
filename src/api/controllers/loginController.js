@@ -1,5 +1,6 @@
 const { validationResult } = require("express-validator");
-const bcrypt = require("bcrypt");
+const bcrypt = require('bcryptjs');
+
 const userModel = require("/app/src/api/models/userModel");
 
 const loginController = async (req, res) => {
