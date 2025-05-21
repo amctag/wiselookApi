@@ -1,9 +1,8 @@
-// src/api/routes/v1/loginRoute.js
 const express = require('express');
 const router = express.Router();
 const { body } = require('express-validator');
-const loginController = require('/app/src/api/controllers/loginController');
-const bcrypt = require('bcryptjs');
+const loginController = require('../controllers/loginController'); // مسار نسبي مفترض
+
 // Validation rules
 const loginValidation = [
   body('password')
@@ -31,7 +30,7 @@ const loginValidation = [
     .isMobilePhone().withMessage('Invalid phone number format')
 ];
 
-// Routes
+// Route
 router.post('/', loginValidation, loginController.login);
 
 module.exports = router;
