@@ -31,7 +31,7 @@ const loginValidation = [
 ];
 
 // Route
-router.post('/', loginValidation, loginController);
+router.post('/', loginValidation, loginController.login);
 
 
 module.exports = router;
